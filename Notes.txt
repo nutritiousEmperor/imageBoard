@@ -1,0 +1,23 @@
+The admin role has the following permissions:
+Create board
+Delete Board
+Create thread
+Delete Thread
+Post Files/images/comments
+Delete User
+Remove roles from user
+add roles to user
+
+The mod role has the following permissions:
+Create thread
+Delete thread
+Delete users with less perms than mod
+Give Mod role to users
+Post FIles/images/Comments
+
+The normal user role has the following permissions:
+Create thread
+Post files/images/comments
+
+Someone without an account has the following permissions:
+Watch boards/threads
