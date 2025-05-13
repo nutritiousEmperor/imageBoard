@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Board;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 
 class BoardController extends Controller
 {
@@ -20,7 +21,7 @@ class BoardController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.createBoard');
     }
 
     /**
@@ -28,7 +29,15 @@ class BoardController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'slug' => 'required|string|alpha_dash|unique:boards,slug',
+        ]);
+
+        Board::create($validated);
+
+        return redirect()->route('admin.createBoard')->with('success', 'Board created successfully.');
     }
 
     /**
@@ -36,7 +45,13 @@ class BoardController extends Controller
      */
     public function show(Board $board)
     {
-        //
+        $viewPath = "boards.$board->slug";
+        
+        if(View::exists($viewPath)) {
+            return view($viewPath);
+        }
+
+        abort(404);
     }
 
     /**
