@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('body')->nullable();
             $table->boolean('is_closed')->default(false);
+            $table->foreignId('user_id')->constrained();
             $table->timestamps();
         });
     }
