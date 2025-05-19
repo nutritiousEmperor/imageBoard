@@ -35,7 +35,9 @@ require __DIR__.'/auth.php';
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/createBoard', [BoardController::class, 'create'])->name('admin.createBoard');
-    Route::post('/admin/boards', [BoardController::class, 'store'])->name('admin.createBoard');
+    Route::post('/admin/boards', [BoardController::class, 'store'])->name('admin.storeBoard');
+    Route::get('/admin/deleteBoard', [BoardController::class, 'showAllBoards'])->name('admin.deleteBoard');
+    Route::delete('/admin/deleteBoard/{board}', [BoardController::class, 'destroy'])->name('admin.destroyBoard');
 });
 
 Route::get('/{board}', [BoardController::class, 'show']);

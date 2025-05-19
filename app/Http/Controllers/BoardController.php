@@ -24,6 +24,19 @@ class BoardController extends Controller
         return view('admin.createBoard');
     }
 
+    private function copyTemplate($validated)
+    {
+        $template = resource_path("views/boards/template.txt");
+        $boardFile = resource_path('views/boards/'.$validated['slug'].'.blade.php');
+        if(!copy($template, $boardFile)) 
+        {
+            \Log::error("Error. Failed to save ${boardFile}. Please manually copy the board template. To ${boardFile}.");
+        } else
+        {
+            \Log::error("Saved ${boardFile} successfully.");
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -35,8 +48,8 @@ class BoardController extends Controller
             'slug' => 'required|string|alpha_dash|unique:boards,slug',
         ]);
 
+        $this->copyTemplate($validated);
         Board::create($validated);
-
         return redirect()->route('admin.createBoard')->with('success', 'Board created successfully.');
     }
 
@@ -48,10 +61,16 @@ class BoardController extends Controller
         $viewPath = "boards.$board->slug";
         
         if(View::exists($viewPath)) {
-            return view($viewPath);
+            return view($viewPath, compact('board'));
         }
 
         abort(404);
+    }
+
+    public function showAllBoards()
+    {
+        $boards = Board::all();
+        return view('admin.deleteBoard', compact('boards'));
     }
 
     /**
@@ -75,6 +94,15 @@ class BoardController extends Controller
      */
     public function destroy(Board $board)
     {
-        //
+        $filePath = resource_path('views/boards/'.$board->slug.'.blade.php');
+        if(file_exists($filePath))
+        {
+            unlink($filePath);
+        } else {
+            \Log::error("Error. Failed to delete ${filePath}. Please manually delete the file.");
+        }
+
+        $board->delete();
+        return redirect()->route('admin.deleteBoard')->with('success', 'Board deleted successfully.');
     }
 }

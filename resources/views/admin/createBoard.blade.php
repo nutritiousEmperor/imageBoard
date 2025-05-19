@@ -6,7 +6,7 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <form action="{{ route('admin.createBoard') }}" method="POST">
+        <form action="{{ route('admin.storeBoard') }}" method="POST">
             @csrf
 
             <div class="mb-3">
