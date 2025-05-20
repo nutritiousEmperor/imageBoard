@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BoardController;
+use App\Http\Controllers\ThreadController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -40,5 +41,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/admin/deleteBoard/{board}', [BoardController::class, 'destroy'])->name('admin.destroyBoard');
 });
 
+// Place all the routes here that are for the user, mod and admin
+Route::middleware(['auth', 'role:user|mod|admin'])->group(function () {
+    Route::get('/{board}/createThread', [ThreadController::class, 'create'])->name('threads.create');
+    Route::get('/{board}/{thread}', [ThreadController::class, 'show'])->name('threads.show');
+    Route::post('/{board}/threads', [ThreadController::class, 'store'])->name('threads.store');
+    Route::delete('/threads/{thread}', [ThreadController::class, 'destroy'])->name('threads.destroy');
+});
+
+// Accessible for everyone:
 Route::get('/{board}', [BoardController::class, 'show']);
 

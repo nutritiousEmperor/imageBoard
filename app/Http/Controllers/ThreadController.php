@@ -3,63 +3,80 @@
 namespace App\Http\Controllers;
 
 use App\Models\Thread;
+use App\Models\Board;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 
 class ThreadController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Show the form for creating a new thread.
      */
-    public function index()
+    public function create(Board $board)
     {
-        //
+        $viewPath = "threads.create";
+
+        if (View::exists($viewPath)) {
+            return view($viewPath, compact('board'));
+        }
+
+        abort(404);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Store a newly created thread in storage.
      */
-    public function create()
+    public function store(Request $request, Board $board)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'nullable|string',
+        ]);
+
+        $thread = Thread::create([
+            'title' => $validated['title'],
+            'body' => $validated['body'],
+            'board_id' => $board->id,
+            'user_id' => Auth::id(),
+        ]);
+
+        return redirect()->route('threads.show', [$board->slug, $thread->id])->with('success', 'Thread created successfully.');
+
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Display the specified thread.
      */
-    public function store(Request $request)
-    {
-        //
+    public function show(Board $board, Thread $thread)
+{
+    // Optional: Verify the thread belongs to the board, for security:
+    if ($thread->board_id !== $board->id) {
+        abort(404);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Thread $thread)
-    {
-        //
+    $viewPath = "threads.show";
+
+    if (View::exists($viewPath)) {
+        return view($viewPath, compact('thread', 'board'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Thread $thread)
-    {
-        //
-    }
+    abort(404);
+}
+
 
     /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Thread $thread)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
+     * Remove the specified thread from storage.
      */
     public function destroy(Thread $thread)
     {
-        //
+        try {
+            $thread->delete();
+        } catch (\Exception $e) {
+            \Log::error("Error deleting thread ID {$thread->id}: {$e->getMessage()}");
+            return back()->withErrors('Failed to delete thread.');
+        }
+
+        return back()->with('success', 'Thread deleted successfully.');
     }
 }
